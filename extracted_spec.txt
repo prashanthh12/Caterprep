@@ -1,0 +1,625 @@
+﻿CaterPrep
+Full Application Design & Development Specification
+Paperless bilingual ingredient requirement lists for caterers
+ಅಕ್ಕಿ / Rice — 4 kg    •    ಈರುಳ್ಳಿ / Onion — 8 kg
+Core concept
+One app user — the caterer/chef. The caterer creates a bilingual ingredient requirement list with quantities, previews it as a client-facing document, and shares it through WhatsApp/PDF. There is no purchase/preparation status workflow and no chef-management module.
+
+Recommended stack: Flutter + Dart + Riverpod + GoRouter + Firebase + Hive + PDF/Share
+Document Version 2.0 • October 2026
+
+Document Contents
+1. Product Definition and Scope
+2. User Model and Core Workflow
+3. Functional Requirements
+4. Information Architecture and Screens
+5. Technology Stack
+6. System Architecture
+7. Flutter Project/File Structure
+8. Data Model and Firestore Structure
+9. State Management and Routing
+10. Bilingual Ingredient and Search Design
+11. PDF, WhatsApp and Client Sharing
+12. Offline Storage and Synchronization
+13. UI/UX Design System
+14. Validation, Empty States and Error Handling
+15. Security and Privacy
+16. Testing Strategy
+17. Development Roadmap
+18. Deployment and Release
+19. Acceptance Criteria
+20. Future Enhancements and Out-of-Scope Features
+
+1. Product Definition and Scope
+CaterPrep is a mobile application for caterers/chefs who currently prepare ingredient requirement lists on paper. The application digitizes that workflow while keeping it simple, fast, bilingual and suitable for real catering work.
+The caterer creates a client/event record, selects ingredients, enters quantities and units, reviews the final list, then shares it with the client. The client does not require an account and does not edit the list inside the app.
+ಅಕ್ಕಿ / Rice — 4 kg
+ತೊಗರಿ ಬೇಳೆ / Toor Dal — 2 kg
+ಎಣ್ಣೆ / Cooking Oil — 3 L
+ಈರುಳ್ಳಿ / Onion — 8 kg
+1.1 Product Objectives
+Replace printed/handwritten catering ingredient lists.
+Reduce rewriting when quantities or items change.
+Store ingredient names in Kannada and English.
+Provide fast quantity and unit entry.
+Allow reusable templates and duplication of previous lists.
+Create a professional client-facing preview/PDF.
+Share the final list using WhatsApp or the device share sheet.
+Keep the application usable even with limited connectivity.
+1.2 Explicitly Out of Scope for the MVP
+No Chef Checklist workflow.
+No Pending / Purchased / Packed / Ready statuses.
+No purchasing progress or reminders such as “8 items still need purchase”.
+No chef/team management.
+No client login.
+No restaurant ordering, delivery or payment flow.
+No inventory/warehouse management.
+One-user model
+There is only one application user type: Caterer/Chef. Authentication may still be used for cloud backup, but there is no role-based user system in the MVP.
+
+
+2. User Model and Core Workflow
+2.1 Primary User
+Caterer / Chef — the person who creates and manages ingredient requirement lists for clients.
+Create and edit client/event lists.
+Select master ingredients or create custom ingredients.
+Enter quantity and unit.
+Reorder and remove items.
+Preview the client-facing document.
+Save, duplicate and reuse previous lists.
+Create templates.
+Generate PDF and share with the client.
+2.2 Client
+The client is a recipient, not an application user. Client data is stored only to identify and format the catering list. The client receives a PDF or shared document/message.
+2.3 Core Workflow
+Welcome  ↓Dashboard  ↓Create New List  ↓Client / Event Details  ↓Select Ingredients  ↓Enter Quantity + Unit  ↓Client Preview  ↓Validate List  ↓Save / PDF / WhatsApp / Share
+3. Functional Requirements
+ID
+Requirement
+Description
+FR-01
+Create a new catering list
+The caterer can create a list for a client/event.
+FR-02
+Client and event details
+Store client name, phone, event name/date/time, guest count, location and notes.
+FR-03
+Bilingual ingredients
+Every master ingredient supports Kannada and English names.
+FR-04
+Ingredient search
+Search by Kannada, English and optional transliterated keyword.
+FR-05
+Category filters
+Filter ingredients by grains, pulses, vegetables, spices, dairy, oils, etc.
+FR-06
+Quantity and unit
+Enter decimal quantity and select unit such as kg, g, L, ml, pcs.
+FR-07
+Custom ingredients
+Create list-specific or reusable custom items.
+FR-08
+Client preview
+Display the final list as the client will receive it.
+FR-09
+Save and edit
+Save a list and edit it later.
+FR-10
+Duplicate list
+Copy a previous list for another event/client.
+FR-11
+Templates
+Create reusable list templates.
+FR-12
+PDF generation
+Create a professional bilingual PDF.
+FR-13
+Share
+Share PDF/list through WhatsApp and the system share sheet.
+FR-14
+Offline use
+Allow reading/editing drafts when temporarily offline.
+FR-15
+Validation
+Prevent final sharing when required information or selected-item quantities are missing.
+
+
+4. Information Architecture and Screen Specification
+00 Welcome01 Dashboard02 Create List / Client Details03 Item List04 Edit Item05 Client Preview06 Summary & Share07 Saved Lists08 Templates09 Profile / Business Settings
+4.1 Welcome
+CaterPrep logo/brand area.
+Short explanation of the paperless workflow.
+Kannada + English support message.
+Primary “Get Started” action.
+No bottom navigation.
+4.2 Dashboard
+Create New List as the primary action.
+Recent Lists.
+Upcoming Events (optional if event date exists).
+Saved Templates.
+Quick access to Lists, Templates and Profile.
+Do not show purchase/preparation progress.
+4.3 Create List / Client Details
+Field
+Type
+Required
+Client Name
+Text
+Yes
+Phone Number
+Phone
+Optional
+Event Name
+Text
+Yes
+Event Date
+Date
+Yes
+Event Time
+Time
+Optional
+Guest Count
+Number
+Recommended
+Location
+Text
+Optional
+Notes
+Multiline
+Optional
+
+4.4 Item List
+The Item List is the most important working screen. It should prioritize speed over decoration.
+Search field supporting Kannada and English.
+Horizontal category chips.
+Ingredient rows with Kannada name, English name, quantity and unit.
+Checkbox/selection state.
+Add Custom Item action.
+Selected-items count.
+Continue to Preview action after list creation.
+ಅಕ್ಕಿ / Rice — 4 kg
+ತೊಗರಿ ಬೇಳೆ / Toor Dal — 2 kg
+ತೆಂಗಿನಕಾಯಿ / Coconut — 20 pcs
+4.5 Edit Item
+Ingredient identity: Kannada + English.
+Quantity stepper and manual numeric entry.
+Unit selector.
+Category selector where required.
+Optional item note.
+Save Changes button.
+No preparation status field.
+4.6 Client Preview
+The Client Preview should visually match the exported/shared document. It groups items by category and clearly shows bilingual item names with quantities.
+CATERPREPWedding Lunch — Sharma Family18 Oct 2026 • 450 Guestsಧಾನ್ಯಗಳು / GRAINSಅಕ್ಕಿ / Rice .......... 20 kgತರಕಾರಿಗಳು / VEGETABLESಈರುಳ್ಳಿ / Onion ...... 25 kgಟೊಮೇಟೊ / Tomato ..... 18 kg
+4.7 Summary & Share
+List title, client, event date and guest count.
+Total number of ingredients and categories.
+Completeness validation.
+Share with Client button.
+Export PDF.
+System Share / WhatsApp.
+4.8 Saved Lists and Templates
+Saved Lists allow viewing, editing, duplicating and sharing old client lists. Templates allow reusable baseline lists for common event types or guest counts.
+
+5. Technology Stack
+The following stack is recommended because the existing design is mobile-first, the project benefits from fast Flutter development, and the data model is document-oriented and relatively simple.
+Layer
+Technology
+Purpose
+UI/UX
+Figma
+Design system, mobile screens, prototypes and handoff.
+Frontend
+Flutter
+Single codebase for Android and future iOS.
+Language
+Dart
+Flutter application logic.
+State Management
+Riverpod
+Predictable feature state, async data and dependency injection.
+Navigation
+GoRouter
+Declarative routing and route guards.
+Cloud Backend
+Firebase
+Managed backend services without maintaining a custom server.
+Database
+Cloud Firestore
+Clients, lists, ingredients, templates and business profile.
+Authentication
+Firebase Authentication
+Optional owner login for cloud backup and multi-device access; one user type only.
+File Storage
+Firebase Storage
+Business logo and optional generated files.
+Offline / Local
+Hive
+Drafts, cached preferences and local-first support where needed.
+PDF
+pdf + printing
+Generate and preview client PDFs.
+Sharing
+share_plus
+System share sheet for PDF/files.
+WhatsApp
+share_plus / url_launcher
+Share to WhatsApp using installed-app handoff.
+Connectivity
+connectivity_plus
+Connectivity status for sync messaging.
+Formatting
+intl
+Dates, times, locale formatting.
+IDs
+uuid
+Local unique identifiers when needed.
+Version Control
+Git + GitHub
+Source history and collaboration.
+IDE
+VS Code / Android Studio
+Development and debugging.
+CI/CD
+GitHub Actions (optional)
+Tests, formatting and build checks.
+Distribution
+Google Play Console
+Android release; App Store can be added later.
+
+5.1 Core MVP Stack
+FigmaFlutter + DartRiverpodGoRouterFirebase Core + FirestoreFirebase Auth (optional but recommended for cloud backup)Hivepdf + printingshare_plusintlconnectivity_plus
+5.2 Suggested Flutter Dependencies
+dependencies:  flutter:    sdk: flutter  flutter_riverpod:  go_router:  firebase_core:  firebase_auth:  cloud_firestore:  firebase_storage:  hive_flutter:  pdf:  printing:  share_plus:  url_launcher:  intl:  connectivity_plus:  uuid:
+Implementation note
+Package versions should be chosen when the project is initialized and pinned in pubspec.yaml. Do not hard-code old version numbers into the architecture document.
+
+
+6. System Architecture
+Figma Design      ↓Flutter UI / Widgets      ↓Riverpod Providers / Controllers      ↓Use Cases / Application Services      ↓Repositories   ↙       ↘Hive      Firebase Firestore(Local)      (Cloud)      ↓PDF / Share Services
+6.1 Layer Responsibilities
+Layer
+Responsibility
+Presentation
+Screens, reusable widgets, form controls, navigation.
+State/Application
+Riverpod providers/controllers, screen state and business actions.
+Domain/Models
+Client, catering list, ingredient, template and value objects.
+Repository
+Abstract read/write operations and hide storage details.
+Services
+PDF creation, sharing, Firebase initialization, local cache and synchronization.
+Data Sources
+Firestore, Firebase Storage and Hive.
+
+6.2 Why No Custom REST API Initially?
+The MVP does not require a dedicated server because the business logic is straightforward and Firestore can securely store the application data. A custom API can be added later if advanced multi-business workflows, billing, complex analytics or integrations are introduced.
+
+7. Flutter Project / File Structure
+caterprep/├── lib/│   ├── main.dart│   ├── app.dart│   ├── core/│   │   ├── constants/│   │   │   ├── app_colors.dart│   │   │   ├── app_strings.dart│   │   │   ├── app_sizes.dart│   │   │   └── app_units.dart│   │   ├── theme/│   │   │   ├── app_theme.dart│   │   │   └── text_styles.dart│   │   ├── routing/│   │   │   ├── app_router.dart│   │   │   └── route_names.dart│   │   ├── utils/│   │   │   ├── validators.dart│   │   │   ├── date_utils.dart│   │   │   └── quantity_utils.dart│   │   └── widgets/│   │       ├── primary_button.dart│   │       ├── app_text_field.dart│   │       ├── empty_state.dart│   │       └── loading_widget.dart│   ├── models/│   │   ├── user.dart│   │   ├── client.dart│   │   ├── catering_list.dart│   │   ├── ingredient.dart│   │   ├── list_ingredient.dart│   │   ├── category.dart│   │   └── template.dart│   ├── features/│   │   ├── welcome/│   │   ├── dashboard/│   │   ├── create_list/│   │   ├── ingredients/│   │   ├── client_preview/│   │   ├── summary/│   │   ├── saved_lists/│   │   ├── templates/│   │   └── profile/│   ├── repositories/│   ├── services/│   │   ├── firestore_service.dart│   │   ├── local_storage_service.dart│   │   ├── pdf_service.dart│   │   ├── share_service.dart│   │   └── sync_service.dart│   └── data/│       ├── ingredient_seed.dart│       ├── category_seed.dart│       └── unit_data.dart├── assets/│   ├── logo/│   ├── icons/│   └── images/├── test/└── pubspec.yaml
+7.1 Feature Folder Pattern
+features/ingredients/├── screens/│   ├── ingredient_list_screen.dart│   ├── edit_ingredient_screen.dart│   └── add_custom_item_screen.dart├── controllers/│   └── ingredient_controller.dart├── providers/│   └── ingredient_providers.dart└── widgets/    ├── ingredient_row.dart    ├── category_chip.dart    ├── quantity_selector.dart    └── unit_selector.dart
+
+8. Data Model and Firestore Structure
+8.1 Core Models
+Model
+Key Fields
+User / Business Profile
+id, name, phone, email, businessName, businessLogo, preferredLanguage
+Client
+id, ownerId, name, phone, address, createdAt, updatedAt
+CateringList
+id, ownerId, clientId, title, eventName, eventDate, eventTime, guestCount, location, notes, createdAt, updatedAt
+Ingredient
+id, nameKannada, nameEnglish, categoryId, defaultUnit, searchKeywords, isCustom
+ListIngredient
+id, listId, ingredientId, quantity, unit, notes, displayOrder
+Category
+id, nameKannada, nameEnglish, displayOrder
+Template
+id, ownerId, name, guestCount, eventType, createdAt, updatedAt
+TemplateIngredient
+id, templateId, ingredientId, quantity, unit, displayOrder
+
+8.2 Example Ingredient
+{  "id": "ING001",  "nameKannada": "ಅಕ್ಕಿ",  "nameEnglish": "Rice",  "categoryId": "GRAINS",  "defaultUnit": "kg",  "searchKeywords": ["rice", "akki", "ಅಕ್ಕಿ"],  "isCustom": false}
+8.3 Firestore Collection Proposal
+users/{userId}clients/{clientId}cateringLists/{listId}cateringLists/{listId}/items/{listItemId}ingredients/{ingredientId}categories/{categoryId}templates/{templateId}templates/{templateId}/items/{templateItemId}
+For an early single-user build, ingredients and categories may be seeded from local JSON/Dart data and moved to Firestore later. This reduces backend setup during UI development.
+9. State Management and Routing
+9.1 Riverpod State
+currentUserProvider — owner/business profile.
+currentDraftListProvider — list currently being created/edited.
+ingredientCatalogProvider — master ingredient catalog.
+categoryProvider — categories.
+savedListsProvider — saved lists from repository.
+templatesProvider — reusable templates.
+clientProvider — clients and selected client.
+shareStateProvider — PDF/share progress and errors.
+9.2 GoRouter Routes
+/welcome/dashboard/lists/lists/new/lists/:listId/lists/:listId/items/lists/:listId/items/:itemId/edit/lists/:listId/preview/lists/:listId/share/templates/templates/:templateId/profile
+
+10. Bilingual Ingredient and Search Design
+Ingredient names should be stored in both Kannada and English, not translated live each time. This keeps wording consistent and makes offline use reliable.
+ಅಕ್ಕಿ / Rice
+ತೊಗರಿ ಬೇಳೆ / Toor Dal
+ಈರುಳ್ಳಿ / Onion
+ಟೊಮೇಟೊ / Tomato
+10.1 Display Rule
+Default display: Kannada as the primary label and English directly below it. A preference may later allow English-only or Kannada-only display.
+10.2 Search Keywords
+Rice ingredient keywords:- rice- akki- ಅಕ್ಕಿOnion ingredient keywords:- onion- eerulli- ಈರುಳ್ಳಿ
+10.3 Units
+Code
+Display
+Use
+KG
+kg
+Bulk solids
+G
+g
+Small-weight solids
+L
+L
+Liquids
+ML
+ml
+Small liquid quantities
+PCS
+pcs
+Countable items
+PACKET
+packet
+Packaged items
+BOX
+box
+Boxed goods
+BUNCH
+bunch
+Leafy vegetables/herbs
+DOZEN
+dozen
+Count by 12
+
+11. PDF, WhatsApp and Client Sharing
+The client-facing output is a core feature. The PDF must look professional and should not expose internal app controls or technical metadata.
+Business logo and business name.
+Client/event name, date, guest count and location.
+Ingredients grouped by category.
+Kannada and English names.
+Quantity and unit aligned clearly.
+Optional list notes.
+Generated-by footer.
+11.1 Share Flow
+Client Preview  ↓Validate required fields and quantities  ↓Generate PDF  ↓Share with Client  ├── WhatsApp / system share sheet  ├── Save / download PDF  └── Re-share later from Saved Lists
+12. Offline Storage and Synchronization
+The application should remain useful when network connectivity is weak. Firestore offers offline persistence on mobile, while Hive can hold local settings, seeded catalogs and drafts where appropriate.
+Save draft form state locally.
+Cache ingredient catalog and categories.
+Allow editing previously loaded lists offline.
+Queue changes and sync when connectivity returns.
+Show a subtle “Saved locally / Syncing” indicator when needed.
+Keep sync simple
+Because there is only one owner user, the MVP can use a simple latest-update-wins approach using updatedAt timestamps. Complex collaborative conflict resolution is unnecessary.
+
+
+13. UI/UX Design System
+Token
+Value / Recommendation
+Primary Green
+#123F35
+Secondary Green
+#2B6E5D
+Soft Green
+#E4F0EB
+Background
+#F6F6F2
+Surface
+#FFFFFF
+Orange Accent
+#E98D31
+Soft Orange
+#FFF0DE
+English Font
+Inter
+Kannada Font
+Anek Kannada / Noto Sans Kannada
+Main horizontal padding
+20 px
+Minimum touch target
+44 × 44 px; prefer 48 × 48 px
+Card radius
+18–20 px
+Primary CTA radius
+16–18 px
+Spacing scale
+4, 8, 12, 16, 20, 24, 32
+
+13.1 Bottom Navigation
+Recommended destinations: Home, Lists, Templates, Profile. Do not use “Prep” because the app no longer tracks preparation status.
+13.2 Accessibility and Kitchen Usability
+Avoid tiny Kannada text.
+Keep high text/background contrast.
+Use large quantity controls and buttons.
+Do not rely on color alone to communicate errors.
+Support dynamic text where practical.
+Use clear empty states and confirmation messages.
+14. Validation, Empty States and Error Handling
+Area
+Rule
+Client/Event
+Client or list title and event name are required; date can be required depending on workflow.
+Guest Count
+If provided, must be greater than zero.
+Ingredient
+Selected item must have a quantity greater than zero and a unit.
+Quantity
+Allow decimals such as 0.5 kg and 2.25 kg.
+Sharing
+Block or warn before sharing if selected items are missing quantity/unit.
+Custom Item
+Require at least Kannada or English name, plus quantity and unit.
+
+14.1 Empty States
+No saved lists yet.Create your first client ingredient list.[ Create New List ]No ingredients found.Try another search or add a custom item.[ Add Custom Item ]
+14.2 Error Messages
+Use short, actionable messages such as “Couldn’t save the list. Check your connection and try again.” Normal success feedback should use a snackbar/toast rather than a blocking dialog.
+15. Security and Privacy
+Use Firebase Authentication if cloud data is enabled.
+Firestore security rules must restrict data to the authenticated owner.
+Do not expose Firebase administrative credentials in the Flutter client.
+Validate user input before database writes.
+Store only necessary client information.
+Business logo uploads should validate file type/size.
+Do not permanently upload generated PDFs unless the feature requires cloud history.
+If the MVP is initially local-only, Firebase Authentication can be deferred. Once cloud backup is introduced, authentication becomes recommended.
+
+16. Testing Strategy
+16.1 Unit Tests
+Quantity validation and conversion.
+Search normalization.
+List completeness validation.
+Template duplication logic.
+Progress-independent summary calculations such as item/category counts.
+16.2 Widget Tests
+Ingredient row rendering in Kannada + English.
+Quantity editor interactions.
+Search and category filter UI.
+Create-list form validation.
+Summary/share states.
+16.3 Integration Tests
+Create a list from start to finish.
+Save and reopen a list.
+Duplicate a list.
+Create from a template.
+Generate PDF and trigger share flow.
+Offline draft and later synchronization.
+16.4 Manual Device Tests
+Android small and large phones.
+Kannada glyph rendering.
+WhatsApp sharing.
+PDF rendering on device.
+Slow/no network mode.
+Keyboard and numeric input behavior.
+17. Development Roadmap
+Phase
+Work
+Phase 1 — Foundation
+Flutter project, theme, routing, Figma design tokens, reusable components.
+Phase 2 — Data
+Models, ingredient/category seed data, repositories, local storage.
+Phase 3 — Main UI
+Welcome, Dashboard, Create List, Item List, Edit Item.
+Phase 4 — List Workflow
+Client Preview, validation, save/edit, Saved Lists.
+Phase 5 — Sharing
+PDF layout, printing preview, share_plus, WhatsApp handoff.
+Phase 6 — Templates
+Template creation/use, duplicate list, guest-count helper if desired.
+Phase 7 — Cloud
+Firebase Auth, Firestore, cloud backup, optional Storage.
+Phase 8 — QA
+Unit/widget/integration tests, device testing, polish, performance.
+Phase 9 — Release
+App icon, signing, privacy details, Play Store release.
+
+18. Deployment and Release
+Use separate Firebase projects for development and production if practical.
+Use Android applicationId such as com.<business>.caterprep.
+Configure app signing and secure keystore handling.
+Generate release APK/AAB through Flutter build tools.
+Test PDF sharing and Kannada rendering on physical devices before release.
+Publish the Android App Bundle through Google Play Console.
+Add iOS support later using the same Flutter codebase.
+
+19. MVP Acceptance Criteria
+Area
+Acceptance Criterion
+Welcome
+The user can enter the application from the Welcome screen.
+Create list
+The caterer can create a new client/event list.
+Bilingual items
+Ingredient rows correctly show Kannada and English names.
+Search
+Search finds ingredients using Kannada or English keywords.
+Quantity
+The caterer can enter decimal quantities and select units.
+Custom item
+A missing ingredient can be added manually.
+Edit/remove
+Selected items can be edited, reordered and removed.
+Preview
+A client-facing preview displays correct data and category grouping.
+Validation
+Missing required quantities are clearly reported before sharing.
+Save
+A list persists and can be reopened.
+Duplicate
+A previous list can be copied for a new client/event.
+Template
+A reusable template can populate a new list.
+PDF
+The app generates a readable bilingual PDF.
+Share
+The PDF/list can be shared using the device share workflow/WhatsApp.
+No status workflow
+The app contains no Pending/Purchased/Packed/Ready preparation workflow.
+
+20. Future Enhancements and Scope Boundaries
+20.1 Good Future Enhancements
+Automatic quantity scaling from a template guest count.
+Client history and frequently used clients.
+Ingredient favorites / recent ingredients.
+Cost estimation (optional separate module).
+Voice-assisted ingredient search/entry.
+Import/export ingredient master list.
+Business-branded PDF themes.
+Cloud backup across multiple owner devices.
+Web dashboard if business requirements grow.
+20.2 Features to Keep Separate Unless Requirements Change
+Purchase tracking.
+Warehouse inventory.
+Chef/team assignments.
+Kitchen task status workflows.
+Client accounts and approval portal.
+Restaurant orders and food delivery.
+Online payment processing.
+Final product definition
+CaterPrep is a paperless bilingual catering ingredient-list application that helps a caterer create Kannada + English ingredient requirement lists with quantities, save/reuse them, preview the client document, and share it directly with the client.
+
+
+Appendix A — Example End-to-End Scenario
+A caterer receives a request for a 450-guest wedding lunch. Instead of filling a paper sheet, the caterer opens CaterPrep, selects the client/event, chooses ingredients, enters the required quantities, previews the final client document, saves it, and sends the PDF through WhatsApp.
+ಅಕ್ಕಿ / Rice — 20 kg
+ತೊಗರಿ ಬೇಳೆ / Toor Dal — 6 kg
+ಎಣ್ಣೆ / Cooking Oil — 10 L
+ಈರುಳ್ಳಿ / Onion — 25 kg
+ಟೊಮೇಟೊ / Tomato — 20 kg
+ತೆಂಗಿನಕಾಯಿ / Coconut — 80 pcs
+Create List → Add Client/Event → Select Items → Enter Quantities → Preview → Save → Share PDF
+Appendix B — Suggested Initial Ingredient Categories
+Kannada
+English
+ಧಾನ್ಯಗಳು
+Grains
+ಬೇಳೆಗಳು
+Pulses
+ತರಕಾರಿಗಳು
+Vegetables
+ಮಸಾಲೆಗಳು
+Spices
+ಎಣ್ಣೆಗಳು
+Oils
+ಹಾಲು ಉತ್ಪನ್ನಗಳು
+Dairy
+ಹಣ್ಣುಗಳು
+Fruits
+ಒಣಹಣ್ಣುಗಳು
+Dry Fruits
+ಸಿಹಿ ಪದಾರ್ಥಗಳು
+Sweet Ingredients
+ಇತರೆ
+Other
+
